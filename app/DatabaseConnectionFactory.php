@@ -3,29 +3,40 @@
 namespace App;
 
 use Exception;
+use PDO;
 use Simplon\Mysql\Mysql;
 use Simplon\Mysql\PDOConnector;
 
 class DatabaseConnectionFactory
 {
-    private static ?Mysql $instance = null;
+    private static ?Mysql $mysql = null;
+    private static ?PDO $pdoConnection = null;
 
     /**
      * @throws Exception
      */
     public static function create(): Mysql
     {
-        $pdo = new PDOConnector(
-            'localhost',
-            'root',
-            '',
-            'tara_tovara'
-        );
-        $pdoConn = $pdo->connect('utf8', []);
-
-        if (self::$instance === null) {
-            self::$instance = new Mysql($pdoConn);
+        if (self::$mysql === null) {
+            self::$mysql = new Mysql(self::createPdoConnection());
         }
-        return self::$instance;
+        return self::$mysql;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function createPdoConnection(): ?PDO
+    {
+        if (self::$pdoConnection === null) {
+            $pdo = new PDOConnector(
+                'localhost',
+                'root',
+                '',
+                'tara_tovara'
+            );
+            self::$pdoConnection = $pdo->connect('utf8', []);
+        }
+        return self::$pdoConnection;
     }
 }

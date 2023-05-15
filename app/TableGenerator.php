@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\database\IncomeDatabaseManager;
 use Exception;
 
 class TableGenerator
@@ -20,6 +21,6 @@ class TableGenerator
     {
         return $this->databaseManager->get([
             'id' => 1,
-        ]);
+        ], 1, 0);
     }
 }
