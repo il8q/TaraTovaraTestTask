@@ -1,9 +1,7 @@
 <?php
 
-namespace App;
+namespace App\Database;
 
-use App\database\IncomeDatabaseManager;
-use App\database\IncomeDatabaseManagerInterface;
 use Exception;
 
 class DatabaseManagerFactory

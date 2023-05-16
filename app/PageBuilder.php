@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\View\TableViewDirector;
 use Simplon\Mysql\MysqlException;
 
 class PageBuilder

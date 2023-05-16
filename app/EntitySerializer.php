@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\database\Income;
+use App\Entity\Income;
 
 class EntitySerializer
 {
@@ -25,11 +25,13 @@ class EntitySerializer
         ];
     }
 
-    public static function serializeIncomesFromArray(array $array): array
+    public static function serializeIncomesFromArray(?array $array): array
     {
         $result = [];
-        foreach ($array as $item) {
-            $result[] = self::serializeIncomeFromArray($item);
+        if ($array) {
+            foreach ($array as $item) {
+                $result[] = self::serializeIncomeFromArray($item);
+            }
         }
         return $result;
     }

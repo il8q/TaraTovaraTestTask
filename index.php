@@ -3,9 +3,6 @@ require_once 'vendor/autoload.php';
 
 use App\PageBuilder;
 use App\PageDirector;
-use App\PageGenerator;
-use App\TableGenerator;
-use App\TableViewDirector;
 use App\TestDataGenerator;
 
 try {

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\database;
+namespace App\Database;
 
+use App\Entity\Income;
 use App\EntitySerializer;
 use Simplon\Mysql\Mysql;
 use Simplon\Mysql\MysqlException;
@@ -27,7 +28,7 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     /**
      * @throws MysqlException
      */
-    public function get(
+    public function find(
         array $criteria,
         array $order,
         ?int $limit = null,
@@ -82,7 +83,7 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
      * @param int|null $offset
      * @return string
      */
-    public function generateSql(
+    private function generateSql(
         array $criteria,
         array $order,
         ?int $limit,
@@ -101,6 +102,8 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
             $query->setLimit($offset);
         }
 
+        // Этот костыль компенсирует невозможность добавить проверку на принадлежность
+        // даты промежутку. ReadQueryBuilder может хранить только одно условие для конкеретной колонки
         return str_replace(
             "`date` = :date",
             QueryHelper::generateCriteriaString($criteria),

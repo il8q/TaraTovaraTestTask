@@ -2,7 +2,8 @@
 
 namespace App;
 
-use App\database\IncomeDatabaseManagerInterface;
+use App\Database\DatabaseManagerFactory;
+use App\Database\IncomeDatabaseManagerInterface;
 use Exception;
 use Simplon\Mysql\MysqlException;
 
@@ -31,7 +32,7 @@ class TableGenerator
     public function generateForCurrentDay(int $time): array
     {
         [$startDay, $endDay] =  TestDataGenerator::getStartAndEndDay($time);
-        $incomes = $this->databaseManager->get(
+        $incomes = $this->databaseManager->find(
             [
                 ['date', $startDay, '>='],
                 ['date', $endDay, '<='],
@@ -52,7 +53,7 @@ class TableGenerator
     public function generateForCurrentWeek(int $time): array
     {
         [$startWeek, $endWeek] =  TestDataGenerator::getStartAndEndWeek($time);
-        $incomes = $this->databaseManager->get(
+        $incomes = $this->databaseManager->find(
             [
                 ['date', $startWeek, '>='],
                 ['date', $endWeek, '<='],
@@ -73,7 +74,7 @@ class TableGenerator
     public function generateForCurrentMonth(int $time): array
     {
         [$startMonth, $endMonth] =  TestDataGenerator::getStartAndEndMonth($time);
-        $incomes =  $this->databaseManager->get(
+        $incomes =  $this->databaseManager->find(
             [
                 ['date', $startMonth, '>='],
                 ['date', $endMonth, '<='],
