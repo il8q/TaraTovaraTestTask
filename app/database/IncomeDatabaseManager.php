@@ -10,6 +10,12 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
 {
     const EXIST_TABLE_CODE_EXCEPTION = '42S01';
     const EXIST_ROW_CODE_EXCEPTION = '23000';
+    const COLUMN_ORDER = [
+        IncomeTableRow::COLUMN_ID,
+        IncomeTableRow::COLUMN_AMOUNT_IN,
+        IncomeTableRow::COLUMN_AMOUNT_OUT,
+        IncomeTableRow::COLUMN_DATE,
+    ];
 
     /**
      * @param Mysql $connection
@@ -26,30 +32,14 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     public function get(
         array $criteria,
         array $order,
-        ?int $limit,
-        ?int $offset
+        ?int $limit = null,
+        ?int $offset = null,
     ): array
     {
-        $query = new ReadQueryBuilder();
-        $query->addSelect('*');
-        $query->setFrom(IncomeTableRow::TABLE_NAME);
-        $query->setConditions($criteria);
-        $query->setSorting($order);
-
-        $rows = $this->connection->fetchRowMany($query->renderQuery());
-        /*$rows = $this->connection->fetchRowMany(sprintf(
-            "SELECT * FROm %s WHERE %s ORDER BY %s",
-            IncomeTableRow::TABLE_NAME,
-            QueryHelper::generateCriteriaString($criteria),
-            QueryHelper::generateOrderString($order)
-        ));*/
+        $sql = $this->generateSql($criteria, $order, $limit, $offset);
+        $rows = $this->connection->fetchRowMany($sql);
         return [
-            'headers' => [
-                IncomeTableRow::COLUMN_ID,
-                IncomeTableRow::COLUMN_DATE,
-                IncomeTableRow::COLUMN_AMOUNT_IN,
-                IncomeTableRow::COLUMN_AMOUNT_OUT
-            ],
+            'headers' => self::COLUMN_ORDER,
             'rows' => $rows,
         ];
     }
@@ -88,5 +78,38 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
                 throw $exception;
             }
         }
+    }
+
+    /**
+     * @param array $criteria
+     * @param array $order
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return string
+     */
+    public function generateSql(
+        array $criteria,
+        array $order,
+        ?int $limit,
+        ?int $offset
+    ): string
+    {
+        $query = new ReadQueryBuilder();
+        $query->setSelect(self::COLUMN_ORDER);
+        $query->setFrom(IncomeTableRow::TABLE_NAME);
+        $query->addCondition('date', '1');
+        $query->setSorting($order);
+        if ($limit) {
+            $query->setLimit($limit);
+        }
+        if ($offset) {
+            $query->setLimit($offset);
+        }
+        $sql = $query->renderQuery();
+        return str_replace(
+            "`date` = :date",
+            QueryHelper::generateCriteriaString($criteria),
+            $sql
+        );
     }
 }

@@ -3,6 +3,7 @@
 namespace App;
 
 use App\database\IncomeDatabaseManagerInterface;
+use DateTime;
 use Exception;
 
 class TestDataGenerator
@@ -23,14 +24,6 @@ class TestDataGenerator
         self::generateForLastDay($databaseManager);
         self::generateForLastWeek($databaseManager);
         self::generateForLastMounth($databaseManager);
-    }
-
-    public static function getStartAndEndMonth(int $date): array
-    {
-        return [
-            strtotime(date('m-01-Y', $date)),
-            strtotime(date('m-t-Y', $date))
-        ];
     }
 
     private static function generateForLastDay(IncomeDatabaseManagerInterface $databaseManager): void
@@ -123,5 +116,30 @@ class TestDataGenerator
             'amount_in' => 33.0,
             'amount_out' => 41.0,
         ]);
+    }
+
+    public static function getStartAndEndMonth(int $date): array
+    {
+        return [
+            strtotime(date('Y-m-01 00:00:00', $date)),
+            strtotime(date('Y-m-t 23:59:59', $date))
+        ];
+    }
+
+    public static function getStartAndEndWeek(int $time): array
+    {
+        $day = date('w', $time);
+        return [
+            strtotime(date('Y-m-d 00:00:00', strtotime('-'.$day.' days'))),
+            strtotime(date('Y-m-d 23:59:59', strtotime('+'.(6-$day).' days')))
+        ];
+    }
+
+    public static function getStartAndEndDay(int $time): array
+    {
+        return [
+            strtotime(date('Y-m-d 00:00:00', $time)),
+            strtotime(date('Y-m-d 23:59:59', $time))
+        ];
     }
 }
