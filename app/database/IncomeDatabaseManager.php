@@ -2,6 +2,7 @@
 
 namespace App\database;
 
+use App\EntitySerializer;
 use Simplon\Mysql\Mysql;
 use Simplon\Mysql\MysqlException;
 use Simplon\Mysql\QueryBuilder\ReadQueryBuilder;
@@ -11,17 +12,14 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     const EXIST_TABLE_CODE_EXCEPTION = '42S01';
     const EXIST_ROW_CODE_EXCEPTION = '23000';
     const COLUMN_ORDER = [
-        IncomeTableRow::COLUMN_ID,
-        IncomeTableRow::COLUMN_AMOUNT_IN,
-        IncomeTableRow::COLUMN_AMOUNT_OUT,
-        IncomeTableRow::COLUMN_DATE,
+        Income::ID_LABEL,
+        Income::AMOUNT_IN_LABEL,
+        Income::AMOUNT_OUT_LABEL,
+        Income::DATE_LABEL,
     ];
 
-    /**
-     * @param Mysql $connection
-     */
     public function __construct(
-        private Mysql $connection,
+        private readonly Mysql $connection,
     )
     {
     }
@@ -38,10 +36,7 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     {
         $sql = $this->generateSql($criteria, $order, $limit, $offset);
         $rows = $this->connection->fetchRowMany($sql);
-        return [
-            'headers' => self::COLUMN_ORDER,
-            'rows' => $rows,
-        ];
+        return EntitySerializer::serializeIncomesFromArray($rows);
     }
 
     /**
@@ -96,7 +91,7 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     {
         $query = new ReadQueryBuilder();
         $query->setSelect(self::COLUMN_ORDER);
-        $query->setFrom(IncomeTableRow::TABLE_NAME);
+        $query->setFrom(Income::TABLE_NAME);
         $query->addCondition('date', '1');
         $query->setSorting($order);
         if ($limit) {
@@ -105,11 +100,11 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
         if ($offset) {
             $query->setLimit($offset);
         }
-        $sql = $query->renderQuery();
+
         return str_replace(
             "`date` = :date",
             QueryHelper::generateCriteriaString($criteria),
-            $sql
+            $query->renderQuery()
         );
     }
 }

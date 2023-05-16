@@ -3,9 +3,13 @@
 namespace App;
 
 use App\database\IncomeDatabaseManagerInterface;
-use DateTime;
 use Exception;
 
+/**
+ * Генерирует тестовые данные.
+ * В этом классе не нужно использовать паттерн строитель, потому что
+ * дальнейшее изменение и улучшение класса не предполагается
+ */
 class TestDataGenerator
 {
     const SECONDS_PER_MINUTE = 60;
@@ -23,7 +27,7 @@ class TestDataGenerator
 
         self::generateForLastDay($databaseManager);
         self::generateForLastWeek($databaseManager);
-        self::generateForLastMounth($databaseManager);
+        self::generateForLastMonth($databaseManager);
     }
 
     private static function generateForLastDay(IncomeDatabaseManagerInterface $databaseManager): void
@@ -96,7 +100,7 @@ class TestDataGenerator
         ]);
     }
 
-    private static function generateForLastMounth(IncomeDatabaseManagerInterface $databaseManager): void
+    private static function generateForLastMonth(IncomeDatabaseManagerInterface $databaseManager): void
     {
         $databaseManager->save([
             'id' => 12,

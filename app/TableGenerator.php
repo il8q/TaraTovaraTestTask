@@ -8,6 +8,13 @@ use Simplon\Mysql\MysqlException;
 
 class TableGenerator
 {
+    const COLUMN_NAMES = [
+        'id',
+        'Доход',
+        'Расход',
+        'Дата',
+    ];
+    
     private IncomeDatabaseManagerInterface $databaseManager;
 
     /**
@@ -24,7 +31,7 @@ class TableGenerator
     public function generateForCurrentDay(int $time): array
     {
         [$startDay, $endDay] =  TestDataGenerator::getStartAndEndDay($time);
-        return $this->databaseManager->get(
+        $incomes = $this->databaseManager->get(
             [
                 ['date', $startDay, '>='],
                 ['date', $endDay, '<='],
@@ -33,6 +40,10 @@ class TableGenerator
                 'date DESC'
             ],
         );
+        return [
+            'headers' => self::COLUMN_NAMES,
+            'rows' => EntitySerializer::serializeIncomeArray($incomes),
+        ];
     }
 
     /**
@@ -41,7 +52,7 @@ class TableGenerator
     public function generateForCurrentWeek(int $time): array
     {
         [$startWeek, $endWeek] =  TestDataGenerator::getStartAndEndWeek($time);
-        return $this->databaseManager->get(
+        $incomes = $this->databaseManager->get(
             [
                 ['date', $startWeek, '>='],
                 ['date', $endWeek, '<='],
@@ -50,6 +61,10 @@ class TableGenerator
                 'date DESC'
             ],
         );
+        return [
+            'headers' => self::COLUMN_NAMES,
+            'rows' => EntitySerializer::serializeIncomeArray($incomes),
+        ];
     }
 
     /**
@@ -58,7 +73,7 @@ class TableGenerator
     public function generateForCurrentMonth(int $time): array
     {
         [$startMonth, $endMonth] =  TestDataGenerator::getStartAndEndMonth($time);
-        return $this->databaseManager->get(
+        $incomes =  $this->databaseManager->get(
             [
                 ['date', $startMonth, '>='],
                 ['date', $endMonth, '<='],
@@ -67,5 +82,9 @@ class TableGenerator
                 'date DESC'
             ],
         );
+        return [
+            'headers' => self::COLUMN_NAMES,
+            'rows' => EntitySerializer::serializeIncomeArray($incomes),
+        ];
     }
 }

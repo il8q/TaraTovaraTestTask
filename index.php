@@ -1,30 +1,17 @@
 <?php
+require_once 'vendor/autoload.php';
 
+use App\PageBuilder;
+use App\PageDirector;
 use App\PageGenerator;
 use App\TableGenerator;
-use App\TableViewGenerator;
+use App\TableViewDirector;
 use App\TestDataGenerator;
-
-require_once 'vendor/autoload.php';
 
 try {
     TestDataGenerator::createData();
-    $tableGenerator = new TableGenerator();
-    echo PageGenerator::renderPage(
-        'Доходы и расходы',
-        TableViewGenerator::generate(
-                'За месяц',
-                $tableGenerator->generateForCurrentMonth(time())
-            )
-            . TableViewGenerator::generate(
-                'За неделю',
-                $tableGenerator->generateForCurrentWeek(time())
-            )
-            . TableViewGenerator::generate(
-                'За день',
-                $tableGenerator->generateForCurrentDay(time())
-            ),
-    );
+    $director = new PageDirector(new PageBuilder());
+    echo $director->construct('Доходы и расходы');
 } catch (Throwable $exception) {
     echo '<p>';
     echo $exception->getMessage();
