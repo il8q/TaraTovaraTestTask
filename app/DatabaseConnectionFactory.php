@@ -35,7 +35,7 @@ class DatabaseConnectionFactory
                 '',
                 'tara_tovara'
             );
-            self::$pdoConnection = $pdo->connect('utf8', []);
+            self::$pdoConnection = $pdo->connect();
         }
         return self::$pdoConnection;
     }

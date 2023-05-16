@@ -4,9 +4,10 @@ namespace App;
 
 class TableViewGenerator
 {
-    public static function generate(array $table): string
+    public static function generate(string $title, array $table): string
     {
-        $result = "<table>";
+        $result = "<h2>$title</h2>";
+        $result .= "<table>";
         $result .= self::generateHeaders($table['headers']);
         $result .= self::generateRows($table['rows']);
         $result .= '</table>';

@@ -12,13 +12,15 @@ try {
     $tableGenerator = new TableGenerator();
     echo PageGenerator::renderPage(
         'Доходы и расходы',
-        TableViewGenerator::generate($tableGenerator->generate())
-            . TableViewGenerator::generate($tableGenerator->generate())
-            . TableViewGenerator::generate($tableGenerator->generate()),
+        TableViewGenerator::generate('За месяц', $tableGenerator->generate())
+            . TableViewGenerator::generate('За неделю', $tableGenerator->generate())
+            . TableViewGenerator::generate('За день', $tableGenerator->generate()),
     );
+    throw new Exception('sdf');
 } catch (Throwable $exception) {
+    echo '<p>';
     echo $exception->getMessage();
     echo '<p>';
-    echo implode($exception->getTrace());
+    var_dump($exception->getTrace());
 }
 
