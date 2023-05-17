@@ -45,4 +45,18 @@ class EntitySerializer
         $result->date = $array[Income::DATE_LABEL];
         return $result;
     }
+
+    public static function serializeIncomeSegments(array $incomes, array $params): array
+    {
+        foreach ($incomes as &$row) {
+            $startPeriod = &$row[$params['segmentationVariable']];
+            $startPeriod *= $params['periodHash'];
+            $startPeriod = sprintf(
+                "%s - %s",
+                date($params['dataFormat'], $startPeriod),
+                date($params['dataFormat'], $startPeriod + $params['periodHash']),
+            );
+        }
+        return $incomes;
+    }
 }

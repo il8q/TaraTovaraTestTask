@@ -45,11 +45,7 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
     public function findAndSegment(array $params): array
     {
         $sql = $this->generateSegmentSql($params);
-        $result = $this->connection->fetchRowMany($sql) ?? [];
-        if (count($result)) {
-            $result = $this->setPeriodLabel($result, $params['segmentationVariable'], $params['periodHash']);
-        }
-        return $result;
+        return $this->connection->fetchRowMany($sql) ?? [];
     }
 
     /**
@@ -149,15 +145,5 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
             QueryHelper::generateCriteriaString($params['criteria']),
             $query->renderQuery()
         );
-    }
-
-    private function setPeriodLabel(array $result, string $variableLabel, int $hash): array
-    {
-        foreach ($result as &$row) {
-            $startPeriod = &$row[$variableLabel];
-            $startPeriod *= $hash;
-            $startPeriod = date('Y-m-d H:I:s', $startPeriod);
-        }
-        return $result;
     }
 }

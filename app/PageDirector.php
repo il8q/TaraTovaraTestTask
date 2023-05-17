@@ -24,13 +24,13 @@ class PageDirector
         $this->builder->addStartHtmlTag();
         $this->builder->addHeader($title);
 
-        $this->builder->addDayTableToBody();
+        $this->builder->addMonthTable();
         $this->builder->addDividerToBody();
 
         $this->builder->addWeekTableToBody();
         $this->builder->addDividerToBody();
 
-        $this->builder->addMonthTable();
+        $this->builder->addDayTableToBody();
         $this->builder->addDividerToBody();
 
         $this->builder->generateAndAddBody($title);

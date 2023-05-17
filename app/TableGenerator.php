@@ -12,7 +12,7 @@ class TableGenerator
     const COLUMN_NAMES = [
         'Доход',
         'Расход',
-        'Дата',
+        'Период',
     ];
     
     private IncomeDatabaseManagerInterface $databaseManager;
@@ -45,7 +45,11 @@ class TableGenerator
         ]);
         return [
             'headers' => self::COLUMN_NAMES,
-            'rows' => $incomes,
+            'rows' => EntitySerializer::serializeIncomeSegments($incomes, [
+                'segmentationVariable' => 'segment_id',
+                'periodHash' => TestDataGenerator::SECONDS_PER_HOUR,
+                'dataFormat' => 'Y-m-d H:i'
+            ]),
         ];
     }
 
@@ -69,7 +73,11 @@ class TableGenerator
         ]);
         return [
             'headers' => self::COLUMN_NAMES,
-            'rows' => $incomes,
+            'rows' => EntitySerializer::serializeIncomeSegments($incomes, [
+                'segmentationVariable' => 'segment_id',
+                'periodHash' => TestDataGenerator::SECONDS_PER_DAY,
+                'dataFormat' => 'Y-m-d'
+            ]),
         ];
     }
 
@@ -93,7 +101,11 @@ class TableGenerator
         ]);
         return [
             'headers' => self::COLUMN_NAMES,
-            'rows' => $incomes,
+            'rows' => EntitySerializer::serializeIncomeSegments($incomes, [
+                'segmentationVariable' => 'segment_id',
+                'periodHash' => TestDataGenerator::SECONDS_PER_WEEK,
+                'dataFormat' => 'Y-m-d'
+            ]),
         ];
     }
 }
