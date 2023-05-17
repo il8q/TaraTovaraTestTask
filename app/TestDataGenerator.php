@@ -27,7 +27,6 @@ class TestDataGenerator
     {
         $databaseManager = DatabaseManagerFactory::createIncomeManager();
         $databaseManager->createTable();
-        
         self::generateForLastDay($databaseManager);
         self::generateForLastWeek($databaseManager);
         self::generateForLastMonth($databaseManager);

@@ -12,6 +12,7 @@ class PageBuilder
         private readonly TableViewDirector $tableViewGenerator = new TableViewDirector(),
         private string                     $result = '',
         private string                     $bodyContent = '',
+        private ?int                       $currentDayTime = null,
     )
     {
     }
@@ -20,6 +21,7 @@ class PageBuilder
     {
         $this->result = '';
         $this->bodyContent = '';
+        $this->currentDayTime = null;
     }
 
     public function addStartTag(): void
@@ -78,7 +80,7 @@ class PageBuilder
     {
         $currentDayTable = $this->tableViewGenerator->generate(
             'За день',
-            $this->tableGenerator->generateForCurrentDay(time())
+            $this->tableGenerator->generateForCurrentDay($this->currentDayTime)
         );
 
         $this->bodyContent .= $currentDayTable;
@@ -96,7 +98,7 @@ class PageBuilder
     {
         $currentWeekTable = $this->tableViewGenerator->generate(
             'За неделю',
-            $this->tableGenerator->generateForCurrentWeek(time())
+            $this->tableGenerator->generateForCurrentWeek($this->currentDayTime)
         );
 
         $this->bodyContent .= $currentWeekTable;
@@ -109,7 +111,7 @@ class PageBuilder
     {
         $currentMonthTable =  $this->tableViewGenerator->generate(
             'За месяц',
-            $this->tableGenerator->generateForCurrentMonth(time())
+            $this->tableGenerator->generateForCurrentMonth($this->currentDayTime)
         );
 
         $this->bodyContent .= $currentMonthTable;
@@ -118,5 +120,10 @@ class PageBuilder
     public function getResult(): string
     {
         return $this->result;
+    }
+
+    public function setCurrentDayTime(int $currentDayTime): void
+    {
+        $this->currentDayTime = $currentDayTime;
     }
 }

@@ -8,7 +8,8 @@ use App\TestDataGenerator;
 try {
     TestDataGenerator::createData();
     $director = new PageDirector(new PageBuilder());
-    echo $director->construct('Доходы и расходы');
+    // Выбрана дата Tue May 16 2023 00:00:01
+    echo $director->construct('Доходы и расходы', 1684195201);
 } catch (Throwable $exception) {
     echo '<p>';
     echo $exception->getMessage();

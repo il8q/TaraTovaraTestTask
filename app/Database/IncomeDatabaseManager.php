@@ -29,15 +29,27 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
      * @throws MysqlException
      */
     public function find(
-        array $criteria,
-        array $order,
+        array $params,
         ?int $limit = null,
         ?int $offset = null,
     ): array
     {
-        $sql = $this->generateSql($criteria, $order, $limit, $offset);
+        $sql = $this->generateSql($params, $limit, $offset);
         $rows = $this->connection->fetchRowMany($sql);
         return EntitySerializer::serializeIncomesFromArray($rows);
+    }
+
+    /**
+     * @throws MysqlException
+     */
+    public function findAndSegment(array $params): array
+    {
+        $sql = $this->generateSegmentSql($params);
+        $result = $this->connection->fetchRowMany($sql) ?? [];
+        if (count($result)) {
+            $result = $this->setPeriodLabel($result, $params['segmentationVariable'], $params['periodHash']);
+        }
+        return $result;
     }
 
     /**
@@ -84,17 +96,12 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
      * @return string
      */
     private function generateSql(
-        array $criteria,
-        array $order,
+        array $params,
         ?int $limit,
         ?int $offset
     ): string
     {
-        $query = new ReadQueryBuilder();
-        $query->setSelect(self::COLUMN_ORDER);
-        $query->setFrom(Income::TABLE_NAME);
-        $query->addCondition('date', '1');
-        $query->setSorting($order);
+        $query = $this->generateQueryForFindRequest($params['order']);
         if ($limit) {
             $query->setLimit($limit);
         }
@@ -106,8 +113,51 @@ class IncomeDatabaseManager implements IncomeDatabaseManagerInterface
         // даты промежутку. ReadQueryBuilder может хранить только одно условие для конкеретной колонки
         return str_replace(
             "`date` = :date",
-            QueryHelper::generateCriteriaString($criteria),
+            QueryHelper::generateCriteriaString($params['criteria']),
             $query->renderQuery()
         );
+    }
+
+    /**
+     * @param array $order
+     * @return ReadQueryBuilder
+     */
+    public function generateQueryForFindRequest(array $order): ReadQueryBuilder
+    {
+        $query = new ReadQueryBuilder();
+        $query->setSelect(self::COLUMN_ORDER);
+        $query->setFrom(Income::TABLE_NAME);
+        $query->addCondition('date', '1');
+        $query->setSorting($order);
+        return $query;
+    }
+
+    private function generateSegmentSql(array $params): string
+    {
+        $query = new ReadQueryBuilder();
+        $query->setSelect([
+            sprintf("sum(%s)", Income::AMOUNT_IN_LABEL),
+            sprintf("sum(%s)", Income::AMOUNT_OUT_LABEL),
+            sprintf("%s as %s", $params['segmentationFunction'], $params['segmentationVariable'])
+        ]);
+        $query->setFrom(Income::TABLE_NAME);
+        $query->addCondition('date', '1');
+        $query->setSorting($params['order']);
+        $query->setGroup([$params['segmentationVariable']]);
+        return str_replace(
+            "`date` = :date",
+            QueryHelper::generateCriteriaString($params['criteria']),
+            $query->renderQuery()
+        );
+    }
+
+    private function setPeriodLabel(array $result, string $variableLabel, int $hash): array
+    {
+        foreach ($result as &$row) {
+            $startPeriod = &$row[$variableLabel];
+            $startPeriod *= $hash;
+            $startPeriod = date('Y-m-d H:I:s', $startPeriod);
+        }
+        return $result;
     }
 }

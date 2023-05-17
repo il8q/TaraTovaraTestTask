@@ -15,9 +15,10 @@ class PageDirector
     /**
      * @throws MysqlException
      */
-    public function construct(string $title): string
+    public function construct(string $title, int $currentDayTime): string
     {
         $this->builder->resetVariables();
+        $this->builder->setCurrentDayTime($currentDayTime);
 
         $this->builder->addStartTag();
         $this->builder->addStartHtmlTag();
